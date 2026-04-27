@@ -22,7 +22,10 @@ export const Card = ({ verb, tense, onAnswer, onNext }: Props) => {
     if (!vv) return;
     const handle = () => {
       setTimeout(() => {
-        inputRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        inputRef.current?.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth'
+        });
       }, 100);
     };
     vv.addEventListener('resize', handle);

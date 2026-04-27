@@ -135,6 +135,12 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const reset = () => window.scrollTo(0, 0);
+    window.addEventListener('scroll', reset, { passive: true });
+    return () => window.removeEventListener('scroll', reset);
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(verbs));
   }, [verbs]);
 
