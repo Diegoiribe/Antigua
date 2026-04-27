@@ -4,9 +4,11 @@ import { verbs as initialVerbs } from './data/verbs';
 import type { Verb } from './types/type-verbs';
 import { Card } from './components/Card';
 import { Progress } from './components/Progress';
+import { Header } from './components/Header';
 
 const STORAGE_KEY = 'oldtown-verbs';
 const DAILY_KEY = 'oldtown-daily';
+const STREAK_KEY = 'oldtown-streak';
 
 interface DailyData {
   date: string;
@@ -14,8 +16,31 @@ interface DailyData {
   goal: number;
 }
 
+interface StreakData {
+  streak: number;
+  lastActiveDate: string;
+}
+
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function yesterdayStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function loadStreak(): StreakData {
+  try {
+    const saved = localStorage.getItem(STREAK_KEY);
+    if (saved) return JSON.parse(saved) as StreakData;
+  } catch {
+    console.log(
+      'Failed to load streak data from localStorage, using initial data.'
+    );
+  }
+  return { streak: 0, lastActiveDate: '' };
 }
 
 function loadDaily(): DailyData {
@@ -96,6 +121,18 @@ function App() {
     answer: string;
   } | null>(null);
   const [daily, setDaily] = useState<DailyData>(loadDaily);
+  const [streakData, setStreakData] = useState<StreakData>(loadStreak);
+  const [viewportH, setViewportH] = useState(
+    () => window.visualViewport?.height ?? window.innerHeight
+  );
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setViewportH(vv.height);
+    vv.addEventListener('resize', update);
+    return () => vv.removeEventListener('resize', update);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(verbs));
@@ -104,6 +141,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem(DAILY_KEY, JSON.stringify(daily));
   }, [daily]);
+
+  useEffect(() => {
+    localStorage.setItem(STREAK_KEY, JSON.stringify(streakData));
+  }, [streakData]);
 
   function handleAnswer(correct: boolean, correctAnswer: string) {
     setVerbs((prev) =>
@@ -133,6 +174,12 @@ function App() {
     );
     setToast({ correct, answer: correctAnswer });
     setDaily((d) => ({ ...d, count: d.count + 1 }));
+    setStreakData((s) => {
+      const today = todayStr();
+      if (s.lastActiveDate === today) return s;
+      const newStreak = s.lastActiveDate === yesterdayStr() ? s.streak + 1 : 1;
+      return { streak: newStreak, lastActiveDate: today };
+    });
   }
 
   function handleNext() {
@@ -145,7 +192,10 @@ function App() {
   }
 
   return (
-    <div className="flex justify-center px-4 pt-4">
+    <div
+      className="flex justify-center px-4 pt-4 overflow-y-auto"
+      style={{ height: viewportH }}
+    >
       {toast && (
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1 rounded-full text-[14px]  whitespace-nowrap"
@@ -159,7 +209,8 @@ function App() {
           {toast.correct ? 'Correct!' : `${toast.answer}`}
         </div>
       )}
-      <div className="w-full px-8 mt-15">
+      <div className="w-full px-8 ">
+        <Header streak={streakData.streak} />
         <Progress
           count={daily.count}
           goal={daily.goal}

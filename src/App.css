@@ -5,9 +5,17 @@
 @layer base {
   html {
     background: var(--page-bg-html, #ffffff);
+    height: 100%;
+    overflow: hidden;
   }
   body {
     background: var(--page-bg-body, #ffffff);
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  #root {
+    height: 100%;
   }
 }
 
