@@ -145,7 +145,7 @@ function App() {
   }
 
   return (
-    <div className="flex justify-center p-4">
+    <div className="flex justify-center px-4 pt-4">
       {toast && (
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1 rounded-full text-[14px]  whitespace-nowrap"

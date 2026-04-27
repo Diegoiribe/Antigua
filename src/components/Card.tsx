@@ -79,7 +79,7 @@ export const Card = ({ verb, tense, onAnswer, onNext }: Props) => {
       )}
 
       {/* Input + actions */}
-      <div className="pb-6 ">
+      <div className="">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             ref={inputRef}
