@@ -18,6 +18,18 @@ export const Card = ({ verb, tense, onAnswer, onNext }: Props) => {
   }, []);
 
   useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const handle = () => {
+      setTimeout(() => {
+        inputRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }, 100);
+    };
+    vv.addEventListener('resize', handle);
+    return () => vv.removeEventListener('resize', handle);
+  }, []);
+
+  useEffect(() => {
     if (!answered) return;
     const timer = setTimeout(onNext, 2000);
     return () => clearTimeout(timer);
