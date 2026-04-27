@@ -159,7 +159,7 @@ function App() {
           {toast.correct ? 'Correct!' : `${toast.answer}`}
         </div>
       )}
-      <div className="w-full max-w-xs px-6 mt-15">
+      <div className="w-full px-8 mt-15">
         <Progress
           count={daily.count}
           goal={daily.goal}
